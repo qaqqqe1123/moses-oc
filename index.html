@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MOSES超频 — 系统优化与性能工具</title>
+  <meta name="description" content="MOSES超频：垃圾清理、硬件监控、系统优化、显卡驱动与电源计划，Windows 一站式桌面工具。" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c0916;
+      --bg-2: #151026;
+      --ink: #f4f0ff;
+      --muted: #a89bc4;
+      --neon: #c25dff;
+      --neon-2: #d67aff;
+      --cyan: #40b8ff;
+      --line: #2a2040;
+      --font-display: "Syne", "Segoe UI", sans-serif;
+      --font-body: "Microsoft YaHei UI", "PingFang SC", "Manrope", "Segoe UI", sans-serif;
+      --font-zh: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif;
+      --brand-size: clamp(2.35rem, 3vw + 1rem, 3.4rem);
+      --max: 1080px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--neon); color: #1a0a28; }
+    img { display: block; max-width: 100%; }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 55% 50% at 88% 30%, rgba(194, 93, 255, 0.2), transparent 58%),
+        radial-gradient(ellipse 45% 40% at 10% 80%, rgba(64, 184, 255, 0.12), transparent 55%),
+        linear-gradient(155deg, #151026 0%, #0c0916 55%, #090712 100%);
+    }
+
+    .hero-bg__art {
+      position: absolute;
+      right: -2%;
+      top: 48%;
+      transform: translateY(-50%);
+      width: min(48vw, 520px);
+      opacity: 0.18;
+      pointer-events: none;
+      animation: drift 16s ease-in-out infinite;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(100% - 2.5rem, var(--max));
+      margin: 0 auto;
+      padding: 1.35rem 0;
+      animation: in 0.7s ease both;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+    }
+    .nav-logo img { width: 28px; height: 28px; border-radius: 6px; }
+    .nav a {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav a:hover { color: var(--neon-2); }
+
+    .hero-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 2rem;
+      width: min(100% - 2.5rem, var(--max));
+      margin: 0 auto;
+      padding: 1rem 0 3.5rem;
+    }
+
+    .hero-copy { animation: in 0.85s ease 0.05s both; }
+
+    .brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--brand-size);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.45rem;
+      color: #f4f0ff;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+    .brand .en { font-family: var(--font-display); }
+    .brand .zh {
+      font-family: var(--font-zh);
+      font-weight: 700;
+      font-size: 0.78em;
+      letter-spacing: 0.06em;
+      margin-left: 0.1em;
+      vertical-align: 0.05em;
+    }
+    .brand b { color: var(--neon); font-weight: inherit; }
+
+    .brand-sub {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.85rem;
+    }
+
+    .lede {
+      max-width: 24rem;
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 1.75rem;
+      font-family: var(--font-zh);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.9rem;
+      padding: 0 1.35rem;
+      font-family: var(--font-zh);
+      font-size: 0.92rem;
+      font-weight: 700;
+      border-radius: 2px;
+      border: 1px solid transparent;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .btn-main {
+      background: var(--neon);
+      color: #1a0a28;
+    }
+    .btn-main:hover {
+      background: var(--neon-2);
+      transform: translateY(-1px);
+    }
+    .btn-sub {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+    .btn-sub:hover {
+      border-color: var(--neon);
+      color: var(--neon-2);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 500;
+    }
+    .meta strong { color: #ddd2f5; font-weight: 600; }
+
+    .hero-media {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: in 0.95s ease 0.12s both;
+    }
+    .hero-media figure {
+      margin: 0;
+      width: 280px;
+      height: 280px;
+      position: relative;
+    }
+    .hero-media figure::before {
+      content: "";
+      position: absolute;
+      inset: -14%;
+      border: 1px solid rgba(194, 93, 255, 0.28);
+      border-radius: 50%;
+      animation: spin 50s linear infinite;
+    }
+    .hero-media img {
+      width: 280px;
+      height: 280px;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+      border-radius: 28px;
+      animation: float 6s ease-in-out infinite;
+      filter: drop-shadow(0 22px 40px rgba(0, 0, 0, 0.45));
+    }
+
+    .wrap {
+      width: min(100% - 2.5rem, var(--max));
+      margin: 0 auto;
+    }
+
+    .panel {
+      padding: 4rem 0 4.5rem;
+      border-top: 1px solid var(--line);
+    }
+    .panel-head { margin-bottom: 1.85rem; max-width: 30rem; }
+    .panel-head .label {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 0.5rem;
+    }
+    .panel-head h2 {
+      font-family: var(--font-zh);
+      font-size: clamp(1.4rem, 1.4vw + 1rem, 1.8rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.45rem;
+    }
+    .panel-head p { color: var(--muted); font-size: 1rem; font-family: var(--font-zh); }
+
+    .list {
+      list-style: none;
+      border-top: 1px solid var(--line);
+    }
+    .list li {
+      display: grid;
+      grid-template-columns: 8.5rem 1fr;
+      gap: 1.2rem;
+      align-items: baseline;
+      padding: 1.15rem 0;
+      border-bottom: 1px solid var(--line);
+      transition: padding-left 0.25s ease;
+    }
+    .list li:hover { padding-left: 0.35rem; }
+    .list .t {
+      font-family: var(--font-zh);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--neon-2);
+    }
+    .list .d {
+      color: #d2c8e8;
+      font-size: 0.98rem;
+      font-weight: 400;
+      font-family: var(--font-zh);
+    }
+
+    .contact {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.35rem 0 3.4rem;
+      border-top: 1px solid var(--line);
+    }
+    .contact h3 {
+      font-family: var(--font-zh);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .contact p { color: var(--muted); font-size: 0.95rem; font-family: var(--font-zh); }
+    .contact button {
+      font-family: var(--font-zh);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--neon-2);
+      background: none;
+      border: none;
+      border-bottom: 1px solid transparent;
+      cursor: pointer;
+      padding: 0.2rem 0;
+      transition: border-color 0.2s;
+    }
+    .contact button:hover { border-bottom-color: var(--neon-2); }
+
+    footer {
+      width: min(100% - 2.5rem, var(--max));
+      margin: 0 auto;
+      padding: 1.25rem 0 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem 1.2rem;
+      color: var(--muted);
+      font-size: 0.86rem;
+      border-top: 1px solid var(--line);
+    }
+    footer a:hover { color: var(--neon-2); }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 1.4rem;
+      transform: translate(-50%, 140%);
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 0.65rem 1rem;
+      font-size: 0.88rem;
+      z-index: 20;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+    .toast.on { transform: translate(-50%, 0); }
+
+    @keyframes in {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes drift {
+      0%, 100% { transform: translateY(-50%) translateX(0); }
+      50% { transform: translateY(-52%) translateX(-10px); }
+    }
+
+    @media (max-width: 840px) {
+      .hero-body {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .lede { margin-inline: auto; }
+      .actions { justify-content: center; }
+      .hero-media { order: -1; }
+      .hero-media figure,
+      .hero-media img { width: 200px; height: 200px; }
+      .hero-bg__art { opacity: 0.1; width: 70vw; }
+      .list li {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+        text-align: left;
+      }
+      .contact { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <img class="hero-bg__art" src="moses-oc.png" alt="" />
+    </div>
+
+    <div class="nav">
+      <div class="nav-logo">
+        <img src="favicon.png" width="28" height="28" alt="" />
+        MOSES超频
+      </div>
+      <a href="#features">功能</a>
+    </div>
+
+    <div class="hero-body">
+      <div class="hero-copy">
+        <div class="brand-sub">Windows Toolkit</div>
+        <h1 class="brand"><span class="en">MOSES</span><span class="zh">超频</span><b>.</b></h1>
+        <p class="lede">清理 · 监控 · 优化 · 驱动 · 电源计划，装好即用的桌面工具箱。</p>
+        <div class="actions">
+          <a class="btn btn-main" id="downloadBtnCn" href="https://4275.com/vkyoad" target="_blank" rel="noopener">国内加速下载</a>
+          <a class="btn btn-sub" id="downloadBtn" href="https://github.com/qaqqqe1123/moses-oc/releases/download/v3.0.0/MOSES_OC_Setup_v3.0.0.exe">GitHub 原链</a>
+        </div>
+        <p class="meta">国内地址 <a href="https://4275.com/vkyoad" target="_blank" rel="noopener">https://4275.com/vkyoad</a></p>
+        <p class="meta">版本 <strong id="verLabel">v3.0.0</strong> · 约 51 MB · Windows 10/11</p>
+      </div>
+
+      <div class="hero-media" aria-hidden="true">
+        <figure>
+          <img src="moses-oc.png" width="280" height="280" alt="" decoding="async" />
+        </figure>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel wrap" id="features">
+      <div class="panel-head">
+        <div class="label">Features</div>
+        <h2>能做什么</h2>
+        <p>面向日常维护与性能调校的整合桌面工具。</p>
+      </div>
+      <ul class="list">
+        <li><span class="t">垃圾清理</span><span class="d">临时文件、缓存、日志、无效注册表与空文件夹</span></li>
+        <li><span class="t">系统优化</span><span class="d">调度、隐私、游戏场景与电源计划一键应用</span></li>
+        <li><span class="t">硬件监控</span><span class="d">CPU / 内存 / 网速实时状态与主机信息</span></li>
+        <li><span class="t">显卡驱动</span><span class="d">NVIDIA 等驱动检测与下载入口</span></li>
+        <li><span class="t">安全扫描</span><span class="d">监控软件与垃圾软件本地检测</span></li>
+        <li><span class="t">网络工具</span><span class="d">网卡、连接、Ping 与诊断报告导出</span></li>
+      </ul>
+    </section>
+
+    <div class="wrap contact">
+      <div>
+        <h3>超频 / 调校咨询</h3>
+        <p>打开抖音搜索作者，沟通方案与档期。</p>
+      </div>
+      <button type="button" id="copyDy" data-id="MOSES">抖音：MOSES</button>
+    </div>
+  </main>
+
+  <footer>
+    <span>© 2026 MOSES超频 · 抖音：MOSES</span>
+    <span>
+      <a href="https://github.com/qaqqqe1123/moses-oc/releases" target="_blank" rel="noopener">全部版本</a>
+      ·
+      <a href="https://qaqqqe1123.github.io/moses-update/" target="_blank" rel="noopener">MOSES 工具箱</a>
+    </span>
+  </footer>
+
+  <div class="toast" id="toast">抖音号已复制</div>
+
+  <script>
+    (function () {
+      var feeds = [
+        "https://cdn.jsdelivr.net/gh/qaqqqe1123/moses-oc@main/latest.json",
+        "https://raw.githubusercontent.com/qaqqqe1123/moses-oc/main/latest.json"
+      ];
+      var btn = document.getElementById("downloadBtn");
+      var btnCn = document.getElementById("downloadBtnCn");
+      var ver = document.getElementById("verLabel");
+
+      function apply(data) {
+        if (!data) return;
+        if (data.version) ver.textContent = "v" + data.version;
+        if (data.download_url) btn.href = data.download_url;
+        if (data.download_url_cn) btnCn.href = data.download_url_cn;
+        else if (data.download_url) btnCn.href = "https://ghfast.top/" + data.download_url;
+      }
+
+      function tryFeed(i) {
+        if (i >= feeds.length) return;
+        fetch(feeds[i], { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+          .then(apply)
+          .catch(function () { tryFeed(i + 1); });
+      }
+      tryFeed(0);
+
+      var dy = document.getElementById("copyDy");
+      var toast = document.getElementById("toast");
+      var timer;
+      dy.addEventListener("click", function () {
+        var text = dy.getAttribute("data-id") || "MOSES";
+        function show() {
+          toast.classList.add("on");
+          clearTimeout(timer);
+          timer = setTimeout(function () { toast.classList.remove("on"); }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(show).catch(function () {
+            window.prompt("复制抖音号", text);
+          });
+        } else {
+          window.prompt("复制抖音号", text);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
