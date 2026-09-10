@@ -1,6 +1,11 @@
 {
-  "version": "3.0.0",
-  "notes": "MOSES超频 v3.0：清理、优化、监控、驱动与电源计划。",
-  "download_url": "https://github.com/qaqqqe1123/moses-oc/releases/download/v3.0.0/MOSES_OC_Setup_v3.0.0.exe",
-  "download_url_cn": "https://4275.com/vkyoad"
+  "version": "3.0.2",
+  "notes": "优化工具箱 v3.0.2：电源计划「MOSES × CKT超频工作室」；系统清理页重新布局；官网提供镜像 / 备用镜像 / GitHub 原版下载。",
+  "download_url": "https://github.com/qaqqqe1123/moses-oc/releases/download/v3.0.2/Optimizer_Setup_v3.0.2.exe",
+  "download_url_cn": "http://4275.com/z3i5vu",
+  "download_url_mirror": "https://gh.llkk.cc/https://github.com/qaqqqe1123/moses-oc/releases/download/v3.0.2/Optimizer_Setup_v3.0.2.exe",
+  "sha256": "84978c936a899862c47b8c6780e6299dd400d804fd20615367646ee90ed2d683",
+  "file_size": 57213380,
+  "publisher": "MOSES x CKT超频工作室",
+  "homepage": "https://moses-opt.pages.dev/"
 }
